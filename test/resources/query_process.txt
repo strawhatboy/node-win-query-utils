@@ -1,0 +1,3 @@
+ USERNAME              SESSIONNAME         ID    PID  IMAGE
+>biubiubi              console              2   4868  svchost.exe
+>biubiubi              console              2  11272  taskhostw.exe

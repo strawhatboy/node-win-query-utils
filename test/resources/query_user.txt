@@ -1,0 +1,2 @@
+ USERNAME              SESSIONNAME        ID  STATE   IDLE TIME  LOGON TIME
+>biubiubi              console             2  Active      14:29  1/25/2017 10:22 AM

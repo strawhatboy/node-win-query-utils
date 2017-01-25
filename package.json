@@ -1,0 +1,23 @@
+{
+  "name": "win-query-utils",
+  "version": "0.0.1",
+  "description": "use query.exe in windows to query information about user, session, process",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/_mocha"
+  },
+  "keywords": [
+    "query",
+    "win",
+    "session",
+    "process"
+  ],
+  "author": "Andy Cui",
+  "license": "MIT",
+
+  "devDependencies": {
+    "mocha": "^3.2.0",
+    "mock-spawn": "^0.2.6",
+    "chai": "^3.5.0"
+  }
+}
