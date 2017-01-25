@@ -1,5 +1,7 @@
 # win-query-utils
 
+[![Build Status](https://travis-ci.org/strawhatboy/node-win-query-utils.svg?branch=master)](https://travis-ci.org/strawhatboy/node-win-query-utils)
+
 use windows `query.exe` to do the query and return the results
 
 ## Example
