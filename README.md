@@ -4,6 +4,15 @@
 
 use windows `query.exe` to do the query and return the results
 
+## Usage
+queryUser | querySession | queryProcess (options, callback)
+
+**options**
+- **timeout** : default: 5000, if the `query` command hang there for some reason, set this value to force return error and kill the process.
+- **serverName** : corresponding to the `/SERVERNAME` option of `query.exe`
+
+> *Note*: options can be omitted to use the default values
+
 ## Example
 ```js
 var winQueryUtils = require('win-query-utils');

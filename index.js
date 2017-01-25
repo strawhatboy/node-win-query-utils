@@ -9,7 +9,7 @@
  */
 var spawn = require('child_process').spawn;
 
-exports = module.exports = (function() {
+exports = module.exports = (function () {
     var COL_NAME = {
         USERNAME: 'username',
         SESSIONNAME: 'sessionName',
@@ -49,20 +49,18 @@ exports = module.exports = (function() {
         }
     };
 
+    var DEFAULT_OPTIONS = {
+        serverName: '',
+        timeout: 5000
+    }
+
     var launchProcessAndGetOutput = function (command, args, timeout, callback) {
         var endFunction = false;
-
-        var timer = setTimeout(function() {
-            if (!endFunction) {
-                endFunction = true;
-                callback('operation time out');
-            }
-        }, timeout);
 
         var process = spawn(command, args);
         var stdout = '';
         var stderr = '';
-        process.on('exit', function(code, signal) {
+        process.on('exit', function (code, signal) {
             // process exit
             if (!endFunction) {
                 endFunction = true;
@@ -70,8 +68,16 @@ exports = module.exports = (function() {
             }
         });
 
-        process.stdout.on('data', function(data) { stdout += data } );
-        process.stderr.on('data', function(data) { stderr += data } );
+        var timer = setTimeout(function () {
+            if (!endFunction) {
+                endFunction = true;
+                process.kill();
+                callback('operation time out');
+            }
+        }, timeout);
+
+        process.stdout.on('data', function (data) { stdout += data });
+        process.stderr.on('data', function (data) { stderr += data });
 
         return process;
     }
@@ -91,7 +97,7 @@ exports = module.exports = (function() {
             for (var col in columns) {
                 if (columns.hasOwnProperty(col)) {
                     var column = columns[col];
-                    obj[COL_NAME[col]] = line.substring(column[0], column.length >= 2 ? column[1] : undefined).trim(); 
+                    obj[COL_NAME[col]] = line.substring(column[0], column.length >= 2 ? column[1] : undefined).trim();
                 }
             }
             array.push(obj);
@@ -112,36 +118,64 @@ exports = module.exports = (function() {
         return processData('process', data);
     }
 
-
-    var queryUser = function (callback) {
-        launchProcessAndGetOutput('query', ['user'], 3000, function(err, data) {
-            if (err) {
-                // got error
-            } else {
-                callback(undefined, processUserData(data.stdout));
-            }
-        });
+    var getOptions = function (options, callback) {
+        if (typeof options === 'function') {
+            callback = options;
+            options = DEFAULT_OPTIONS;
+        }
+        var additionalParams = [];
+        if (options.serverName) {
+            additionalParams.push('/SERVERNAME:' + options.serverName);
+        }
+        return { options: options, callback: callback, additionalParams: additionalParams };
     }
 
-    var queryProcess = function (callback) {
-        launchProcessAndGetOutput('query', ['process', '*'], 3000, function(err, data) {
-            if (err) {
-                // got error
-            } else {
-                callback(undefined, processProcessData(data.stdout));
-            }
-        });
+    var queryUser = function (options, callback) {
+        var parameters = getOptions(options, callback);
+        launchProcessAndGetOutput(
+            'query',
+            ['user'].concat(parameters.additionalParams),
+            parameters.options.timeout,
+            function (err, data) {
+                if (err) {
+                    // got error
+                    parameters.callback ? parameters.callback('timeout') : '';
+                } else {
+                    parameters.callback ? parameters.callback(undefined, processUserData(data.stdout)) : '';
+                }
+            });
     }
 
-    var querySession = function (callback) {
-        launchProcessAndGetOutput('query', ['session'], 3000, function(err, data) {
-            if (err) {
-                // got error
-                callback('timeout');
-            } else {
-                callback(undefined, processSessionData(data.stdout));
-            }
-        });
+    var queryProcess = function (options, callback) {
+        var parameters = getOptions(options, callback);
+        launchProcessAndGetOutput(
+            'query',
+            ['process', '*'].concat(parameters.additionalParams),
+            parameters.options.timeout,
+            function (err, data) {
+                if (err) {
+                    // got error
+                    parameters.callback ? parameters.callback('timeout') : '';
+                } else {
+                    parameters.callback ? parameters.callback(undefined, processProcessData(data.stdout)) : '';
+                }
+            });
+    }
+
+    var querySession = function (options, callback) {
+        var parameters = getOptions(options, callback);
+        launchProcessAndGetOutput(
+            'query',
+            ['session'].concat(parameters.additionalParams),
+            parameters.options.timeout,
+            function (err, data) {
+                if (err) {
+                    // got error
+                    parameters.callback ? parameters.callback('timeout') : '';
+                } else {
+                    parameters.callback ? parameters.callback(undefined, processSessionData(data.stdout)) : '';
+                }
+            });
     }
 
     return {
