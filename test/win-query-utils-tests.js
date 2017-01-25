@@ -31,12 +31,6 @@ var expect = require('chai').expect;
 describe('win-query-utils', function() {
     this.timeout(10000);
 
-    before(function() {
-        if (!os.type().toLowerCase().includes('windows')) {
-            this.skip();
-        }
-    });
-
     it('should parse the query user result correctly', function(done) {
         winQueryUtils.queryUser(function(err, data) {
             expect(data[0].username).to.equal('biubiubi');
